@@ -14,6 +14,8 @@ const ProductForm = () => {
   });
   // console.log(formData);
 
+  const [reload, setReload] = useState(false);
+
   const handleChange = (e) => {
     const { name, value, files } = e.target;
     if (name === "image") {
@@ -52,6 +54,7 @@ const ProductForm = () => {
 
     if (!imageUrl) {
       console.error("Image upload failed. Aborting form submission.");
+      setReload(false);
       return;
     }
 
@@ -125,7 +128,9 @@ const ProductForm = () => {
         <label htmlFor="image">Image:</label>
         <input type="file" id="image" name="image" onChange={handleChange} />
       </div>
-      <button type="submit">Submit</button>
+      <button type="submit" disabled={loading}>
+        {reload ? "Submitting..." : "Submit"}
+      </button>
     </form>
   );
 };
