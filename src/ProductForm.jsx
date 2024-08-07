@@ -1,8 +1,7 @@
 // src/components/ProductForm.js
 import React, { useState } from "react";
-// import Cloud from "./Cloud.jsx";
 import axios from "axios";
-import { Cloudinary } from "@cloudinary/url-gen/index";
+
 const ProductForm = () => {
   const [formData, setFormData] = useState({
     id: "",
@@ -10,11 +9,8 @@ const ProductForm = () => {
     description: "",
     price: "",
     image: null,
-    // imageUrl: "",
   });
-  // console.log(formData);
-
-  const [reload, setReload] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
@@ -30,6 +26,7 @@ const ProductForm = () => {
       });
     }
   };
+
   const handleImageUpload = async () => {
     const data = new FormData();
     data.append("file", formData.image);
@@ -45,16 +42,17 @@ const ProductForm = () => {
       return response.data.secure_url;
     } catch (error) {
       console.error("Error uploading image:", error);
+      return null;
     }
   };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     const imageUrl = await handleImageUpload();
 
     if (!imageUrl) {
       console.error("Image upload failed. Aborting form submission.");
-      setReload(false);
       return;
     }
 
@@ -76,12 +74,23 @@ const ProductForm = () => {
       });
       const result = await response.json();
       console.log("Form submitted:", result);
+
+      // Clear the form fields
+      setFormData({
+        id: "",
+        name: "",
+        description: "",
+        price: "",
+        image: null,
+      });
+      setSubmitted(true); // Change button text
+
+      // Reset the submitted state after 3 seconds
+      setTimeout(() => setSubmitted(false), 3000);
     } catch (err) {
       console.error("Error:", err);
     }
   };
-
-  
 
   return (
     <form onSubmit={handleSubmit}>
@@ -128,11 +137,12 @@ const ProductForm = () => {
         <label htmlFor="image">Image:</label>
         <input type="file" id="image" name="image" onChange={handleChange} />
       </div>
-      <button type="submit" disabled={loading}>
-        {reload ? "Submitting..." : "Submit"}
+      <button type="submit">
+        {submitted ? "Submitted!" : "Submit"}
       </button>
     </form>
   );
 };
 
 export default ProductForm;
+
