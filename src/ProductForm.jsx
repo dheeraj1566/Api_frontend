@@ -64,7 +64,7 @@ const ProductForm = () => {
     };
 
     try {
-      const response = await fetch("https://api-backend-l9q5.onrender.com/POST", {
+      const response = await fetch("https://api-backend-l9q5.onrender.com/post", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
