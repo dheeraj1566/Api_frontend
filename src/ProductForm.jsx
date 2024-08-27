@@ -1,16 +1,31 @@
-// src/components/ProductForm.js
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import axios from "axios";
-
+import './productform.css'
 const ProductForm = () => {
+  const [Submitted, setSubmitted] = useState(false);
   const [formData, setFormData] = useState({
     id: "",
     name: "",
     description: "",
     price: "",
     image: null,
+    // imageUrl: "",
   });
-  const [submitted, setSubmitted] = useState(false);
+  // console.log(formData);
+  useEffect(() => {
+    const lastId = localStorage.getItem("lastId");
+    if (lastId) {
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        id: parseInt(lastId) + 1,
+      }));
+    } else {
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        id: 0,
+      }));
+    }
+  }, []);           
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
@@ -26,7 +41,7 @@ const ProductForm = () => {
       });
     }
   };
-
+  
   const handleImageUpload = async () => {
     const data = new FormData();
     data.append("file", formData.image);
@@ -42,13 +57,11 @@ const ProductForm = () => {
       return response.data.secure_url;
     } catch (error) {
       console.error("Error uploading image:", error);
-      return null;
     }
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    
     const imageUrl = await handleImageUpload();
 
     if (!imageUrl) {
@@ -56,6 +69,7 @@ const ProductForm = () => {
       return;
     }
 
+    
     const productData = {
       id: formData.id,
       name: formData.name,
@@ -74,35 +88,27 @@ const ProductForm = () => {
       });
       const result = await response.json();
       console.log("Form submitted:", result);
-
+      setSubmitted(true); 
+      localStorage.setItem("lastId", formData.id);
       setFormData({
-        id: "",
+        id: formData.id + 1, 
         name: "",
         description: "",
         price: "",
         image: null,
       });
-      setSubmitted(true); 
-
-   
-      setTimeout(() => setSubmitted(false), 3000);
     } catch (err) {
       console.error("Error:", err);
     }
   };
+  if (Submitted) {
+    return <p>Form submitted successfully!</p>;
+  }
+  
+  
 
   return (
     <form onSubmit={handleSubmit}>
-      <div>
-        <label htmlFor="id">ID:</label>
-        <input
-          type="text"
-          id="id"
-          name="id"
-          value={formData.id}
-          onChange={handleChange}
-        />
-      </div>
       <div>
         <label htmlFor="name">Name:</label>
         <input
@@ -136,9 +142,7 @@ const ProductForm = () => {
         <label htmlFor="image">Image:</label>
         <input type="file" id="image" name="image" onChange={handleChange} />
       </div>
-      <button type="submit">
-        {submitted ? "Submitted!" : "Submit"}
-      </button>
+      <button type="submit">Submit</button>
     </form>
   );
 };
