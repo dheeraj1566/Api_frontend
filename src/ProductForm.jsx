@@ -1,6 +1,7 @@
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
-import './productform.css'
+import './productform.css';
+
 const ProductForm = () => {
   const [Submitted, setSubmitted] = useState(false);
   const [formData, setFormData] = useState({
@@ -8,10 +9,10 @@ const ProductForm = () => {
     name: "",
     description: "",
     price: "",
-    image: null,
-    // imageUrl: "",
+    category: "",
+    image: null
   });
-  // console.log(formData);
+
   useEffect(() => {
     const lastId = localStorage.getItem("lastId");
     if (lastId) {
@@ -41,7 +42,7 @@ const ProductForm = () => {
       });
     }
   };
-  
+
   const handleImageUpload = async () => {
     const data = new FormData();
     data.append("file", formData.image);
@@ -59,6 +60,7 @@ const ProductForm = () => {
       console.error("Error uploading image:", error);
     }
   };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -69,15 +71,15 @@ const ProductForm = () => {
       return;
     }
 
-    
     const productData = {
       id: formData.id,
       name: formData.name,
       description: formData.description,
       price: formData.price,
+      category: formData.category,
       image: imageUrl,
     };
-
+    // console.log(formData.Category);
     try {
       const response = await fetch("https://api-backend-l9q5.onrender.com/post", {
         method: "POST",
@@ -95,17 +97,17 @@ const ProductForm = () => {
         name: "",
         description: "",
         price: "",
+        category: "",
         image: null,
       });
     } catch (err) {
       console.error("Error:", err);
     }
   };
+
   if (Submitted) {
     return <p>Form submitted successfully!</p>;
   }
-  
-  
 
   return (
     <form onSubmit={handleSubmit}>
@@ -139,6 +141,16 @@ const ProductForm = () => {
         />
       </div>
       <div>
+        <label htmlFor="category">Category:</label>
+        <input
+          type="text"
+          id="category"
+          name="category"
+          value={formData.category}
+          onChange={handleChange}
+        />
+      </div>
+      <div>
         <label htmlFor="image">Image:</label>
         <input type="file" id="image" name="image" onChange={handleChange} />
       </div>
@@ -148,4 +160,3 @@ const ProductForm = () => {
 };
 
 export default ProductForm;
-
